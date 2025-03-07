@@ -3,12 +3,12 @@ import copy
 
 app = Flask(__name__)
 
-def load_algorithm_recursively(result, result_inicialized, remaining_load, first_load, is_remaining_load, powerplants, i, j):
+def load_algorithm_recursively(result, result_inicialized, remaining_load, first_load, powerplants, i, j):
     #checking if we have not exceded the length of powerplants
     print("i---->" + str(i))
     print("j---->" + str(j))
     print(result)
-    if i < len(powerplants) and is_remaining_load == True:
+    if i < len(powerplants):
         if j < len(powerplants):
             allocated_power = min(powerplants[j]["pmax"], max(powerplants[j]["pmin"], remaining_load))
             if remaining_load - allocated_power >= 0 and allocated_power > 0 and result[j]["p"] == 0:
@@ -19,9 +19,9 @@ def load_algorithm_recursively(result, result_inicialized, remaining_load, first
                 if remaining_load == 0:
                     return result
                 else:
-                    return load_algorithm_recursively(result, result_inicialized, remaining_load,first_load,is_remaining_load, powerplants, i, 0)
+                    return load_algorithm_recursively(result, result_inicialized, remaining_load,first_load, powerplants, i, 0)
             else:
-                return load_algorithm_recursively(result, result_inicialized, remaining_load,first_load,is_remaining_load, powerplants, i, j+1)
+                return load_algorithm_recursively(result, result_inicialized, remaining_load,first_load, powerplants, i, j+1)
             
         else:
             result = copy.deepcopy(result_inicialized)
@@ -30,7 +30,11 @@ def load_algorithm_recursively(result, result_inicialized, remaining_load, first
             allocated_power = min(powerplants[i+1]["pmax"], max(powerplants[i+1]["pmin"], remaining_load))
             result[i+1]["p"] = round(allocated_power, 1)
             remaining_load -= allocated_power
-            return load_algorithm_recursively(result, result_inicialized, remaining_load,first_load,is_remaining_load, powerplants, i+1, 0)
+
+            if remaining_load == 0:
+                return result
+            
+            return load_algorithm_recursively(result, result_inicialized, remaining_load,first_load, powerplants, i+1, 0)
 
 def load_algorithm_linear(load, result_inicialized, powerplants):
     is_remaining_load = True
@@ -94,7 +98,7 @@ def calculate_production_plan(load, fuels, powerplants):
     # 3. Loads
     result_inicialized = inicialize_results(powerplants)
     
-    is_remaining_load = True
+    
     i = 0
     j = 0
     result = copy.deepcopy(result_inicialized)
@@ -104,7 +108,7 @@ def calculate_production_plan(load, fuels, powerplants):
     result[i]["p"] = round(allocated_power, 1)
     remaining_load -= allocated_power
 
-    result = load_algorithm_recursively(result, result_inicialized, remaining_load, load, is_remaining_load, powerplants, i, j)
+    result = load_algorithm_recursively(result, result_inicialized, remaining_load, load, powerplants, i, j)
 
     #result = load_algorithm_linear(load,result_inicialized,powerplants)
 
