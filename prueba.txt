@@ -1,0 +1,87 @@
+
+
+
+
+    for plant in powerplants:
+        result = []
+        remaining_load = load
+        #First load
+        allocated_power = min(plant["pmax"], max(plant["pmin"], remaining_load))
+        result.append({"name": plant["name"], "p": round(allocated_power, 1)})
+        remaining_load -= allocated_power
+        i = 0
+        while i < len(powerplants):
+            #result = remove_if_needed(powerplants[i]["name"], result)
+            if not check_results(powerplants[i]["name"], result):
+                allocated_power = min(powerplants[i]["pmax"], max(powerplants[i]["pmin"], remaining_load))
+
+                #Checking if its enough load 
+                if remaining_load - allocated_power >= 0 and allocated_power > 0:
+                    result.append({"name": powerplants[i]["name"], "p": round(allocated_power, 1)})
+                    remaining_load -= allocated_power
+                    i = 0
+                """else:
+                    result.append({"name": powerplants[i]["name"], "p": 0.0})"""
+                
+            i += 1
+            print(result)    
+        if remaining_load == 0:
+            break
+for plant in powerplants:
+        result = []
+        remaining_load = load
+        #First load
+        allocated_power = min(plant["pmax"], max(plant["pmin"], remaining_load))
+        result.append({"name": plant["name"], "p": round(allocated_power, 1)})
+        remaining_load -= allocated_power
+        for plant2 in powerplants:
+            if plant2["name"] != plant["name"]:
+
+                allocated_power = min(plant2["pmax"], max(plant2["pmin"], remaining_load))
+
+                #Checking if its enough load 
+                if remaining_load - allocated_power >= 0:
+                    result.append({"name": plant2["name"], "p": round(allocated_power, 1)})
+                    remaining_load -= allocated_power
+                else:
+                    result.append({"name": plant2["name"], "p": 0.0})
+                         
+        if remaining_load == 0:
+            break
+# Dockerfile
+# ---------
+# FROM python:3.8
+# WORKDIR /app
+# COPY requirements.txt ./
+# RUN pip install --no-cache-dir -r requirements.txt
+# COPY . .
+# CMD ["python", "app.py"]
+
+# README.md
+# ---------
+# # Powerplant Production Plan API
+# This API calculates the optimal power output for a set of power plants to match a given load.
+#
+# ## Requirements
+# - Python 3.8+
+# - Flask
+#
+# ## Installation & Usage
+# 1. Install dependencies:
+#    ```bash
+#    pip install -r requirements.txt
+#    ```
+# 2. Run the API:
+#    ```bash
+#    python app.py
+#    ```
+#
+# ## Running with Docker
+# 1. Build the Docker image:
+#    ```bash
+#    docker build -t powerplant-api .
+#    ```
+# 2. Run the container:
+#    ```bash
+#    docker run -p 8888:8888 powerplant-api
+#    ```
